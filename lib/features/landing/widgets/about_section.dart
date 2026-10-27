@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
-import 'common.dart';
 
 /// Section Tentang Kami (setara `components/ui/about-section.jsx`).
 class AboutSection extends StatelessWidget {

@@ -1,19 +1,51 @@
+import 'package:flutter/foundation.dart';
+
 /// Konfigurasi alamat API backend PolijeCare (Laravel).
 ///
-/// Default mengarah ke server produksi yang sama dengan versi web
-/// (`frontend/.env.production`). Untuk memakai server lokal, jalankan:
-///
-/// ```
-/// flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000/api
-/// ```
-/// (`10.0.2.2` = localhost komputer jika dijalankan di emulator Android.)
+/// Menyesuaikan otomatis seperti `frontend/src/config.js`:
+/// - Web / Windows / Desktop lokal: `http://localhost:8000/api`
+/// - Emulator Android lokal: `http://10.0.2.2:8000/api`
+/// - Produksi: `https://polijecare.my.id/backend/api`
 class ApiConfig {
   ApiConfig._();
 
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'https://api.polijecare.my.id/api',
-  );
+  static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL');
+
+  /// Daftar kandidat URL backend yang akan dicoba secara berurutan
+  /// jika server utama belum merespons.
+  static List<String> get candidateBaseUrls {
+    if (_envBaseUrl.isNotEmpty) return [_envBaseUrl];
+    if (kIsWeb) {
+      return const [
+        'http://localhost:8000/api',
+        'http://127.0.0.1:8000/api',
+        'https://polijecare.my.id/backend/api',
+        'https://polijecare.my.id/api',
+      ];
+    }
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return const [
+        'http://10.0.2.2:8000/api',
+        'http://localhost:8000/api',
+        'https://polijecare.my.id/backend/api',
+        'https://polijecare.my.id/api',
+      ];
+    }
+    return const [
+      'http://localhost:8000/api',
+      'http://127.0.0.1:8000/api',
+      'https://polijecare.my.id/backend/api',
+      'https://polijecare.my.id/api',
+    ];
+  }
+
+  static String _activeBaseUrl = candidateBaseUrls.first;
+
+  static String get baseUrl => _activeBaseUrl;
+
+  static void setActiveBaseUrl(String url) {
+    _activeBaseUrl = url;
+  }
 
   /// Base URL tanpa akhiran `/api` (setara `STORAGE_BASE_URL` di web).
   static String get storageBaseUrl {
@@ -27,7 +59,10 @@ class ApiConfig {
   /// Proxy file dari FileController (`/api/files/view?path=`).
   static String get fileProxyUrl => '$storageBaseUrl/api/files/view?path=';
 
-  static const Duration timeout = Duration(seconds: 15);
+  /// Nomor WhatsApp konfirmasi pengaduan Satgas PPKPT (setara `CONFIRM_REPORT_WHATSAPP` di web).
+  static const String confirmReportWhatsapp = '6282126432696';
+
+  static const Duration timeout = Duration(seconds: 6);
 }
 
 /// Konstanta kontak yang sama dengan versi web.
@@ -50,4 +85,3 @@ class AppContact {
   static const String mapsUrl =
       'https://www.google.com/maps/search/?api=1&query=Politeknik+Negeri+Jember';
 }
-

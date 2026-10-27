@@ -222,12 +222,12 @@ class _ArticleCard extends StatelessWidget {
             CachedNetworkImage(
               imageUrl: article.imageUrl,
               fit: BoxFit.cover,
-              placeholder: (_, __) => Container(color: AppColors.gray200),
-              errorWidget: (_, __, ___) => CachedNetworkImage(
+              placeholder: (_, _) => Container(color: AppColors.gray200),
+              errorWidget: (_, _, _) => CachedNetworkImage(
                 imageUrl:
                     'https://picsum.photos/seed/${article.slug}/800/400.jpg',
                 fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => Container(
+                errorWidget: (_, _, _) => Container(
                   color: AppColors.gray300,
                   child: const Icon(Icons.image_not_supported_outlined,
                       color: AppColors.gray500, size: 48),
